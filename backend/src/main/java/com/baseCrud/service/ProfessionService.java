@@ -1,5 +1,6 @@
 package com.baseCrud.service;
 
+import com.baseCrud.dto.ProfessionDto;
 import com.baseCrud.entitty.Profession;
 import com.baseCrud.repository.ProfessionRepository;
 import org.springframework.data.domain.Page;
@@ -17,24 +18,24 @@ public class ProfessionService {
         this.professionRepository = professionRepository;
     }
 
-
-    public Page<Profession> getAllProfessions(Pageable pageable) {
-        return professionRepository.findAll(pageable);
+    public Page<ProfessionDto> getAllProfessions(Pageable pageable) {
+        return professionRepository.findAll(pageable).map(ProfessionDto::new);
     }
 
-    public Optional<Profession> getProfessionById(UUID id) {
-        return professionRepository.findById(id);
+    public Optional<ProfessionDto> getProfessionById(UUID id) {
+        return professionRepository.findById(id).map(ProfessionDto::new);
     }
 
-    public Profession createProfession(Profession profession) {
-        return professionRepository.save(profession);
+    public ProfessionDto createProfession(ProfessionDto professionDto) {
+        Profession profession = toEntity(professionDto);
+        return new ProfessionDto(professionRepository.save(profession));
     }
 
-    public Optional<Profession> updateProfession(UUID id, Profession updatedProfession) {
+    public Optional<ProfessionDto> updateProfession(UUID id, ProfessionDto updatedProfessionDto) {
         return professionRepository.findById(id).map(profession -> {
-            profession.setName(updatedProfession.getName());
-            profession.setNote(updatedProfession.getNote());
-            return professionRepository.save(profession);
+            profession.setName(updatedProfessionDto.getName());
+            profession.setNote(updatedProfessionDto.getNote());
+            return new ProfessionDto(professionRepository.save(profession));
         });
     }
 
@@ -44,5 +45,9 @@ public class ProfessionService {
             return true;
         }
         return false;
+    }
+
+    private Profession toEntity(ProfessionDto professionDto) {
+        return new Profession(professionDto.getId(), professionDto.getName(), professionDto.getNote());
     }
 }

@@ -1,6 +1,6 @@
 package com.baseCrud.controller;
 
-import com.baseCrud.entitty.Department;
+import com.baseCrud.dto.DepartmentDto;
 import com.baseCrud.service.DepartmentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,25 +19,25 @@ public class DepartmentController {
     }
 
     @GetMapping
-    public Page<Department> getAll(@RequestParam(defaultValue = "0") int page,
+    public Page<DepartmentDto> getAll(@RequestParam(defaultValue = "0") int page,
                                    @RequestParam(defaultValue = "10") int size) {
         return departmentService.getAllDepartments(PageRequest.of(page, size));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Department> getById(@PathVariable UUID id) {
+    public ResponseEntity<DepartmentDto> getById(@PathVariable UUID id) {
         return departmentService.getDepartmentById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Department> create(@RequestBody Department department) {
+    public ResponseEntity<DepartmentDto> create(@RequestBody DepartmentDto department) {
         return ResponseEntity.ok(departmentService.createDepartment(department));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Department> update(@PathVariable UUID id, @RequestBody Department updatedDepartment) {
+    public ResponseEntity<DepartmentDto> update(@PathVariable UUID id, @RequestBody DepartmentDto updatedDepartment) {
         return departmentService.updateDepartment(id, updatedDepartment)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

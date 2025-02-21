@@ -1,6 +1,6 @@
 package com.baseCrud.controller;
 
-import com.baseCrud.entitty.Employee;
+import com.baseCrud.dto.EmployeeDto;
 import com.baseCrud.service.EmployeeService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,25 +19,25 @@ public class EmployeeController {
     }
     
     @GetMapping
-    public Page<Employee> getAll(@RequestParam(defaultValue = "0") int page,
-                                 @RequestParam(defaultValue = "10") int size) {
+    public Page<EmployeeDto> getAll(@RequestParam(defaultValue = "0") int page,
+                                    @RequestParam(defaultValue = "10") int size) {
         return employeeService.getAllEmployees(PageRequest.of(page, size));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Employee> getById(@PathVariable UUID id) {
+    public ResponseEntity<EmployeeDto> getById(@PathVariable UUID id) {
         return employeeService.getEmployeeById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Employee> create(@RequestBody Employee employee) {
+    public ResponseEntity<EmployeeDto> create(@RequestBody EmployeeDto employee) {
         return ResponseEntity.ok(employeeService.createEmployee(employee));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Employee> update(@PathVariable UUID id, @RequestBody Employee updatedEmployee) {
+    public ResponseEntity<EmployeeDto> update(@PathVariable UUID id, @RequestBody EmployeeDto updatedEmployee) {
         return employeeService.updateEmployee(id, updatedEmployee)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
