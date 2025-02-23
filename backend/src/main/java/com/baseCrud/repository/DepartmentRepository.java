@@ -9,4 +9,5 @@ import java.util.UUID;
 
 public interface DepartmentRepository extends JpaRepository<Department, UUID> {
     Page<Department> findAll(Pageable pageable);
+    long countByParentDepartment(Department parentDepartment);
 }

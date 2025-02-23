@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Professions from '@/components/Professions.vue'
-import Departments from '@/components/Departments.vue'
-import Employees from '@/components/Employees.vue'
+import Professions from '@/components/profession/Professions.vue'
+import Departments from '@/components/department/Departments.vue'
+import Employees from '@/components/employee/Employees.vue'
 
 const routes = [
   {

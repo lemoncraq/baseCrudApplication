@@ -8,8 +8,8 @@ export interface Profession {
 }
 
 export default class ProfessionService {
-  static async getAll(page = 0, size = 10): Promise<PaginatedResponse<Profession>> {
-    const response = await api.get(`/professions?page=${page}&size=${size}`)
+  static async getAll(): Promise<Profession[]> {
+    const response = await api.get(`/professions`)
     return response.data
   }
 

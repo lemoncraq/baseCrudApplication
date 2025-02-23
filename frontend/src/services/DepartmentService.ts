@@ -9,8 +9,8 @@ export interface Department {
 }
 
 export default class DepartmentService {
-  static async getAll(page = 0, size = 10): Promise<PaginatedResponse<Department>> {
-    const response = await api.get(`/departments?page=${page}&size=${size}`)
+  static async getAll(): Promise<Department[]> {
+    const response = await api.get(`/departments`)
     return response.data
   }
 

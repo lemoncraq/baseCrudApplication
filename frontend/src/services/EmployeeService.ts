@@ -12,8 +12,8 @@ export interface Employee {
 }
 
 export default class EmployeeService {
-  static async getAll(page = 0, size = 10): Promise<PaginatedResponse<Employee>> {
-    const response = await api.get(`/employees?page=${page}&size=${size}`)
+  static async getAll(): Promise<Employee[]> {
+    const response = await api.get(`/employees`)
     return response.data
   }
 

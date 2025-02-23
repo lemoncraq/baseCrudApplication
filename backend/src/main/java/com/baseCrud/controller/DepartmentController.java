@@ -2,11 +2,12 @@ package com.baseCrud.controller;
 
 import com.baseCrud.dto.DepartmentDto;
 import com.baseCrud.service.DepartmentService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -19,33 +20,34 @@ public class DepartmentController {
     }
 
     @GetMapping
-    public Page<DepartmentDto> getAll(@RequestParam(defaultValue = "0") int page,
-                                   @RequestParam(defaultValue = "10") int size) {
-        return departmentService.getAllDepartments(PageRequest.of(page, size));
+    public ResponseEntity<List<DepartmentDto>> getAll() {
+        return ResponseEntity.ok(
+                departmentService.getAllDepartments()
+        );
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<DepartmentDto> getById(@PathVariable UUID id) {
-        return departmentService.getDepartmentById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(departmentService.getDepartmentById(id));
     }
 
     @PostMapping
-    public ResponseEntity<DepartmentDto> create(@RequestBody DepartmentDto department) {
-        return ResponseEntity.ok(departmentService.createDepartment(department));
+    public ResponseEntity<DepartmentDto> create(@RequestBody @Valid DepartmentDto department) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(departmentService.createDepartment(department));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DepartmentDto> update(@PathVariable UUID id, @RequestBody DepartmentDto updatedDepartment) {
-        return departmentService.updateDepartment(id, updatedDepartment)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<DepartmentDto> update(
+            @PathVariable UUID id,
+            @RequestBody @Valid DepartmentDto updatedDepartment) {
+        return ResponseEntity.ok(departmentService.updateDepartment(id, updatedDepartment));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        return departmentService.deleteDepartment(id) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable UUID id) {
+        departmentService.deleteDepartment(id);
     }
 
 }

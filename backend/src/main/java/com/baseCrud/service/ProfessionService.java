@@ -2,49 +2,63 @@ package com.baseCrud.service;
 
 import com.baseCrud.dto.ProfessionDto;
 import com.baseCrud.entitty.Profession;
+import com.baseCrud.repository.EmployeeRepository;
 import com.baseCrud.repository.ProfessionRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 
 @Service
 public class ProfessionService {
     private final ProfessionRepository professionRepository;
 
-    public ProfessionService(ProfessionRepository professionRepository) {
+    private final EmployeeRepository employeeRepository;
+
+    public ProfessionService(ProfessionRepository professionRepository,
+                             EmployeeRepository employeeRepository) {
         this.professionRepository = professionRepository;
+        this.employeeRepository = employeeRepository;
     }
 
-    public Page<ProfessionDto> getAllProfessions(Pageable pageable) {
-        return professionRepository.findAll(pageable).map(ProfessionDto::new);
+    public List<ProfessionDto> getAllProfessions() {
+        return professionRepository.findAll().stream().map(ProfessionDto::new).toList();
     }
 
-    public Optional<ProfessionDto> getProfessionById(UUID id) {
-        return professionRepository.findById(id).map(ProfessionDto::new);
+    public ProfessionDto getProfessionById(UUID id) {
+        return professionRepository.findById(id)
+                .map(ProfessionDto::new)
+                .orElseThrow(() -> new EntityNotFoundException("Профессия с ID " + id + " не найдена"));
     }
 
+    @Transactional
     public ProfessionDto createProfession(ProfessionDto professionDto) {
         Profession profession = toEntity(professionDto);
         return new ProfessionDto(professionRepository.save(profession));
     }
 
-    public Optional<ProfessionDto> updateProfession(UUID id, ProfessionDto updatedProfessionDto) {
-        return professionRepository.findById(id).map(profession -> {
-            profession.setName(updatedProfessionDto.getName());
-            profession.setNote(updatedProfessionDto.getNote());
-            return new ProfessionDto(professionRepository.save(profession));
-        });
+    @Transactional
+    public ProfessionDto updateProfession(UUID id, ProfessionDto updatedProfessionDto) {
+        Profession profession = professionRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Профессия с ID " + id + " не найдена"));
+
+        profession.setName(updatedProfessionDto.getName());
+        profession.setNote(updatedProfessionDto.getNote());
+
+        return new ProfessionDto(professionRepository.save(profession));
     }
 
-    public boolean deleteProfession(UUID id) {
-        if (professionRepository.existsById(id)) {
-            professionRepository.deleteById(id);
-            return true;
+    @Transactional
+    public void deleteProfession(UUID id) {
+        Profession profession = professionRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Профессия с ID " + id + " не найдена"));
+        long relatedRecords = employeeRepository.countByProfessionId(id);
+        if (relatedRecords > 0) {
+            throw new IllegalStateException("Невозможно удалить профессию с ID " + id + ", так как существуют связанные записи");
         }
-        return false;
+        professionRepository.delete(profession);
     }
 
     private Profession toEntity(ProfessionDto professionDto) {

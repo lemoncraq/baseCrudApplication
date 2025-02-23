@@ -1,6 +1,8 @@
 package com.baseCrud.entitty;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
 
@@ -10,16 +12,21 @@ public class Employee {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @NotBlank(message = "ФИО обязательно")
+    @Column(nullable = false)
     private String fullName;
 
+    @Column(nullable = true)
     private String note;
 
-    @ManyToOne
-    @JoinColumn(name = "profession_id")
+    @NotNull(message = "Профессия обязательна")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "profession_id", nullable = false)
     private Profession profession;
 
-    @ManyToOne
-    @JoinColumn(name = "department_id")
+    @NotNull(message = "Отдел обязателен")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "department_id", nullable = false)
     private Department department;
 
     public Employee() {

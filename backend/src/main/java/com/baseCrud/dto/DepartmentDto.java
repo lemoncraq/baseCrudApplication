@@ -20,7 +20,12 @@ public class DepartmentDto {
     }
 
     public DepartmentDto(Department department) {
-        this(department.getId(), department.getName(), department.getNote(), department.getParentDepartment().getId());
+        this(
+                department.getId(),
+                department.getName(),
+                department.getNote(),
+                department.getParentDepartment() != null ? department.getParentDepartment().getId() : null
+                );
     }
 
     public UUID getId() {

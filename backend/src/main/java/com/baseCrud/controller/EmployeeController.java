@@ -2,11 +2,12 @@ package com.baseCrud.controller;
 
 import com.baseCrud.dto.EmployeeDto;
 import com.baseCrud.service.EmployeeService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -17,34 +18,35 @@ public class EmployeeController {
     public EmployeeController(EmployeeService employeeService) {
         this.employeeService = employeeService;
     }
-    
+
     @GetMapping
-    public Page<EmployeeDto> getAll(@RequestParam(defaultValue = "0") int page,
-                                    @RequestParam(defaultValue = "10") int size) {
-        return employeeService.getAllEmployees(PageRequest.of(page, size));
+    public ResponseEntity<List<EmployeeDto>> getAll() {
+        return ResponseEntity.ok(
+                employeeService.getAllEmployees()
+        );
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<EmployeeDto> getById(@PathVariable UUID id) {
-        return employeeService.getEmployeeById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(employeeService.getEmployeeById(id));
     }
 
     @PostMapping
-    public ResponseEntity<EmployeeDto> create(@RequestBody EmployeeDto employee) {
-        return ResponseEntity.ok(employeeService.createEmployee(employee));
+    public ResponseEntity<EmployeeDto> create(@RequestBody @Valid EmployeeDto employee) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(employeeService.createEmployee(employee));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EmployeeDto> update(@PathVariable UUID id, @RequestBody EmployeeDto updatedEmployee) {
-        return employeeService.updateEmployee(id, updatedEmployee)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<EmployeeDto> update(
+            @PathVariable UUID id,
+            @RequestBody @Valid EmployeeDto updatedEmployee) {
+        return ResponseEntity.ok(employeeService.updateEmployee(id, updatedEmployee));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        return employeeService.deleteEmployee(id) ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable UUID id) {
+        employeeService.deleteEmployee(id);
     }
 }

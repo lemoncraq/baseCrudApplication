@@ -9,4 +9,6 @@ import java.util.UUID;
 
 public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
     Page<Employee> findAll(Pageable pageable);
+    long countByDepartmentId(UUID departmentId);
+    long countByProfessionId(UUID professionId);
 }
